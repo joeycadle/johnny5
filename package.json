@@ -1,0 +1,17 @@
+{
+  "name": "johnny5",
+  "version": "0.0.0",
+  "description": "Johnny5 is alive with state machines",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joeycadle/johnny5.git"
+  },
+  "author": "Joseph Cadle Allgaier <https://github.com/joeycadle>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joeycadle/johnny5/issues"
+  },
+  "homepage": "https://github.com/joeycadle/johnny5#readme"
+}
