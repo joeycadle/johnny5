@@ -1,5 +1,6 @@
 import { DEVTOOLS_KEY, MACHINE_MIDDLEWARE_CREATED, MESSAGES_MACHINE_NOT_FOUND } from './constants'
 import { handleError } from './helpers/handleError'
+import { createMachine } from './createMachine'
 
 const machines = {}
 const middlewares = []
@@ -16,6 +17,7 @@ function destroyMachine(machine) {
   const _machine = typeof machine === 'string' ? getMachineByString(machine) : machine
 
   delete machines[_machine.id]
+  // Future cleanup methods go here.
 }
 
 export default function Johnny5(id) {

@@ -8,7 +8,7 @@
     "type": "git",
     "url": "git+https://github.com/joeycadle/johnny5.git"
   },
-  "author": "Joseph Cadle Allgaier <https://github.com/joeycadle>",
+  "author": "Joseph Cadle <https://github.com/joeycadle>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/joeycadle/johnny5/issues"
