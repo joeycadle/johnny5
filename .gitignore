@@ -17,6 +17,9 @@ coverage/
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# npm publish
+src/package.json
+
 # Logs
 logs
 *.log
