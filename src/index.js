@@ -1,15 +1,20 @@
-import { DEVTOOLS_KEY, MACHINE_MIDDLEWARE_CREATED, MESSAGES_MACHINE_NOT_FOUND } from './constants'
+import { DEVTOOLS_KEY, MACHINE_MIDDLEWARE_CREATED, MESSAGE_MACHINE_NOT_FOUND } from './constants'
 import { handleError } from './helpers/handleError'
 import { createMachine } from './createMachine'
+import { Map, List } from 'immutable'
 
-const machines = {}
-const middlewares = []
+let machines = Map({})
+let middlewares = List([])
+
+export function getMachines() {
+  return machines.toJS()
+}
 
 export function addMiddleware() {}
 
 function destroyMachine(machine) {
   const getMachineByString = () => {
-    !machines[machine] && handleError({ msg: MESSAGES_MACHINE_NOT_FOUND, id: machine, throw: true })
+    !machines[machine] && handleError({ id: machine, msg: MESSAGE_MACHINE_NOT_FOUND })
 
     return machines[machine]
   }
@@ -23,17 +28,16 @@ function destroyMachine(machine) {
 export default function Johnny5(id) {
   const create = (config) => {
     const machine = createMachine(id, config, middlewares)
-
-    machines[machine.name] = machine
-    handleMiddleware(MACHINE_MIDDLEWARE_CREATED, machine, machine)
     machine.destroy = () => destroyMachine(machine)
+    machines = machines.set(machine.id, machine)
+    // executeMiddleware(MACHINE_MIDDLEWARE_CREATED, machine, middlewares)
 
     return machine
   }
 
-  return machines[id] || { create }
+  return machines.get(id) || { create }
 }
 
 if (typeof window !== 'undefined') {
-  window[DEVTOOLS_KEY] = factory
+  window[DEVTOOLS_KEY] = Johnny5
 }

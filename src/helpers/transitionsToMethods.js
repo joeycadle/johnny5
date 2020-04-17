@@ -1,6 +1,6 @@
 import { toCamelCase } from './toCamelCase'
-import { updateIn, mergeDeep } from 'immutable'
 import { handleError } from './handleError'
+import { MESSAGE_NO_DUPLICATE_TRANSITION, MESSAGE_NO_DUPLICATE_CREATOR } from '../constants'
 
 export function transitionsToMethods(
   transitions,
@@ -10,32 +10,64 @@ export function transitionsToMethods(
   setState,
   updateContext
 ) {
-  const dispatch = (creatorKey, { next = '', context = {} }) => {
-    if (next.length === 0) {
-      handleError({ id: creatorKey, msg: MESSAGES_NO_STATE_TO_TRANSITION_TO })
-      return
+  // A dispatch method that updates a machine's state and context
+  const dispatch = (arg) => {
+    const handleObj = () => {
+      const { next, context = {} } = arg
+      setState(next)
+      updateContext(context)
     }
 
-    updateContext(context)
-    setState(next)
+    const handleString = () => setState(arg)
+
+    typeof arg === 'string' && handleString()
+    arg instanceof Object && typeof arg.constructor === 'function' && handleObj()
   }
 
-  return Object.keys(transitions).reduce((methods, key) => {
-    const transitionCreators = transitions[key]
+  const dispatchViaFunction = (creatorFn, args) => creatorFn(dispatch)(...args)
 
-    methods[toCamelCase(`is ${key}`)] = () => getState() === key
+  const validTransition = (transition) => {
+    // Validate we're allowed to transition based on what transition is calling
+    // the this creator. If the current state does not match the transition
+    // then we shouldn't be updating the state as the transition is invalid!
+    // If we didn't do this check we could get into a scenario in where say
+    // the 'fetchActivity' creator can only run if the current state is 'idle'
+    // as it runs an async fetch() and then sets the state to 'fetching' and i
+    return getState() === transition
+  }
+
+  return Object.keys(transitions).reduce((methods, transition) => {
+    const transitionCreators = transitions[transition]
+    const matcherKey = toCamelCase(`is ${transition}`)
+    // Since a matcher method is generated for each state and added to
+    // the machine object we need to ensure there are no matching transition
+    // states...
+    !!methods[matcherKey] && handleError({ id: matcherKey, msg: MESSAGE_NO_DUPLICATE_TRANSITION })
+
+    // Generate a matcher method
+    methods[matcherKey] = () => getState() === transition
 
     Object.keys(transitionCreators).forEach((creator) => {
+      let callback
       const curr = transitionCreators[creator]
-      // A transition can be a function or a string. In the case of a function
-      // We not only need to execute the function but need to update the state,
-      // and possible the context based on the return of that callback...
-      // In the case of a string we know there will be no context updates
-      // so we'll call the dispatch method with a proper object
-      const cb =
-        typeof curr === 'string' ? dispatch(creator, { next: curr }) : (...args) => dispatch(creator, curr(...args))
+      const creatorKey = toCamelCase(creator)
+      const cbString = () => validTransition(transition) && dispatch(curr)
+      const cbFn = (...args) => validTransition(transition) && dispatchViaFunction(curr, args)
+      const setCb = (cb) => {
+        callback = cb
+      }
 
-      methods[toCamelCase(transition)] = cb
+      // We accept functions, and strings as creators with each handled a little differently
+      typeof curr === 'string' && setCb(cbString)
+      typeof curr === 'function' && setCb(cbFn)
+
+      // Since a dispatch method is generated for each creator and added to
+      // the machine object we need to ensure there are no matching creator
+      // states...
+      !!methods[creatorKey] && handleError({ id: creatorKey, msg: MESSAGE_NO_DUPLICATE_CREATOR })
+
+      // Generate a creator method
+      methods[creatorKey] = callback
     })
 
     return methods
