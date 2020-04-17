@@ -23,15 +23,24 @@ export function createMachine(id, config, globalMiddlewares) {
     nextState && nextState.length > 0 && updateState()
   }
 
-  const updateContext = (nextContext) => {
+  const getContext = () => immutableContext.toJS()
+  const setContext = (nextContext = {}) => {
     immutableContext = immutableContext.mergeDeep(fromJS(nextContext))
   }
 
   return {
     id,
     state: getState,
-    context: () => immutableContext.toJS(),
+    context: getContext,
     transitions: () => immutableTransitions.toJS(),
-    ...transitionsToMethods(transitions, globalMiddlewares, localMiddlewares, getState, setState, updateContext),
+    ...transitionsToMethods(
+      transitions,
+      globalMiddlewares,
+      localMiddlewares,
+      getState,
+      setState,
+      getContext,
+      setContext
+    ),
   }
 }

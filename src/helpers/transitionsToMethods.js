@@ -8,14 +8,15 @@ export function transitionsToMethods(
   localMiddlewares,
   getState,
   setState,
-  updateContext
+  getContext,
+  setContext
 ) {
   // A dispatch method that updates a machine's state and context
   const dispatch = (arg) => {
     const handleObj = () => {
       const { next, context = {} } = arg
       setState(next)
-      updateContext(context)
+      setContext(context)
     }
 
     const handleString = () => setState(arg)
@@ -24,15 +25,9 @@ export function transitionsToMethods(
     arg instanceof Object && typeof arg.constructor === 'function' && handleObj()
   }
 
-  const dispatchViaFunction = (creatorFn, args) => creatorFn(dispatch)(...args)
+  const dispatchViaFunction = (creatorFn, args) => creatorFn(dispatch, getState, getContext)(...args)
 
   const validTransition = (transition) => {
-    // Validate we're allowed to transition based on what transition is calling
-    // the this creator. If the current state does not match the transition
-    // then we shouldn't be updating the state as the transition is invalid!
-    // If we didn't do this check we could get into a scenario in where say
-    // the 'fetchActivity' creator can only run if the current state is 'idle'
-    // as it runs an async fetch() and then sets the state to 'fetching' and i
     return getState() === transition
   }
 

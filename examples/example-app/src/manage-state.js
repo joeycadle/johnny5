@@ -18,7 +18,6 @@ const getUsername = (dispatch) => async (userId) => {
 
   try {
     const result = await fetchUser(userId)
-    console.log('xxx', result)
     dispatch({
       next: 'jumping',
       context: { user: result },
@@ -34,7 +33,7 @@ const MachineA = Johnny5('machineA').create({
   transitions: {
     idle: {
       getUsername,
-      consoleWarn: (dispatch) => () => {
+      consoleWarn: (dispatch, getState, getContext) => () => {
         console.warn('foobarbazqux')
         dispatch('warning')
       },
