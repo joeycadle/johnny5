@@ -3,9 +3,10 @@
   "version": "0.0.2",
   "description": "Johnny5 is alive with state machines",
   "scripts": {
-    "copy": "cp ./package.json ./src/package.json",
-    "clean": "rm ./src/package.json",
-    "publish": "npm run copy && np && npm run clean"
+    "copy": "cp -f ./package.json ./src/package.json",
+    "clean": "rm -f ./src/package.json",
+    "bump": "cd ./src && npm version $NODE_ENV",
+    "publish": "npm run copy && npm run bump && np $NODE_ENV && npm run clean"
   },
   "np": {
     "yarn": false,
