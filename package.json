@@ -3,6 +3,10 @@
   "version": "0.0.2",
   "description": "Johnny5 is alive with state machines",
   "scripts": {},
+  "np": {
+    "yarn": false,
+    "contents": "src"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/joeycadle/johnny5.git"
