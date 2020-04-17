@@ -5,7 +5,7 @@
   "scripts": {
     "copy": "cp ./package.json ./src/package.json",
     "clean": "rm ./src/package.json",
-    "publish": "npm run copy && npm run np && npm run clean"
+    "publish": "npm run copy && np && npm run clean"
   },
   "np": {
     "yarn": false,
