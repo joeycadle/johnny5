@@ -1,6 +1,6 @@
 {
   "name": "johnny5",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Johnny5 is alive with state machines",
   "scripts": {
     "copy": "cp -f ./package.json ./src/package.json",
