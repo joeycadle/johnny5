@@ -2,6 +2,7 @@
   "name": "johnny5",
   "version": "0.0.3",
   "description": "Johnny5 is alive with state machines",
+  "main": "src/index.js",
   "scripts": {
     "copy": "cp -f ./package.json ./src/package.json",
     "clean": "rm -f ./src/package.json",
